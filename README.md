@@ -2,7 +2,17 @@
 
 # Query Text Parser
 
-The Query Text Parser library performs search query text parsing
+The Query Text Parser library performs search query text parsing.
+
+This allows you to write a search query in free form text and parse it into a machine-readable parsing tree.
+
+The library is fully unit-tested.
+
+## Features
+
+* AND/OR operators
+* Grouped queries using paranthesis -- i.e. `(Denver AND Boston) OR Miami`
+* Multi-word search queries using quotes -- i.e. `"San Francisco" AND Chicago`
 
 ## Example usage
 
@@ -50,3 +60,7 @@ Engage\QueryTextParser\Data\Group Object
 
 )
 ```
+
+## TODO
+
+* Support negating operator (i.e. *NOT*)
