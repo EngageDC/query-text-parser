@@ -92,6 +92,66 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     public function testComplex() {
 		try {
 			$result = $this->parser->parse('(Chicago AND Houston OR (Dallas AND Austin AND Columbus)) OR ((Phoenix OR Detroit) AND Charlotte)');
+			/*
+			(
+				Chicago AND Houston
+				OR
+				(
+					Dallas AND Austin AND Columbus
+				)
+			)
+			OR
+			(
+				(
+					Phoenix OR Detroit
+				)
+				AND
+				Charlotte
+			)
+			*/
+		
+			// Verify consistency of outer group
+			$this->assertInstanceOf('Engage\QueryTextParser\Data\Group', $result);
+			$this->assertEquals($result->type, GroupComparison::OPERATOR_OR);
+			$this->assertCount(2, $result->children);
+
+			// Left side -- "Chicago AND Houston OR (Dallas AND Austin AND Columbus)"
+			$leftSide = $result->children[0];
+			$this->assertInstanceOf('Engage\QueryTextParser\Data\Group', $leftSide);
+			$this->assertEquals($leftSide->type, GroupComparison::OPERATOR_OR);
+
+			// Chicago AND Houston
+			$leftLeftSide = $leftSide->children[0];
+			$this->assertInstanceOf('Engage\QueryTextParser\Data\Group', $leftLeftSide);
+			$this->assertEquals($leftLeftSide->type, GroupComparison::OPERATOR_AND);
+			$this->assertEquals($leftLeftSide->children[0]->text, 'Chicago');
+			$this->assertEquals($leftLeftSide->children[1]->text, 'Houston');
+
+			// Dallas AND Austin AND Columbus
+			$rightLeftSide = $leftSide->children[1];
+			$this->assertInstanceOf('Engage\QueryTextParser\Data\Group', $rightLeftSide);
+			$this->assertEquals($rightLeftSide->type, GroupComparison::OPERATOR_AND);
+			$this->assertEquals($rightLeftSide->children[0]->text, 'Dallas');
+			$this->assertEquals($rightLeftSide->children[1]->text, 'Austin');
+			$this->assertEquals($rightLeftSide->children[2]->text, 'Columbus');
+
+			// Right side -- "(Phoenix OR Detroit) AND Charlotte"
+			$rightSide = $result->children[1];
+			$this->assertInstanceOf('Engage\QueryTextParser\Data\Group', $rightSide);
+			$this->assertEquals($rightSide->type, GroupComparison::OPERATOR_AND);
+
+			// Phoeneix OR Detroit
+			$leftRightSide = $rightSide->children[0];
+			$this->assertInstanceOf('Engage\QueryTextParser\Data\Group', $leftRightSide);
+			$this->assertEquals($leftRightSide->type, GroupComparison::OPERATOR_OR);
+			$this->assertEquals($leftRightSide->children[0]->text, 'Phoenix');
+			$this->assertEquals($leftRightSide->children[1]->text, 'Detroit');
+
+			// Charlotte
+			$rightRightSide = $rightSide->children[1];
+			$this->assertInstanceOf('Engage\QueryTextParser\Data\Partial', $rightRightSide);
+			$this->assertEquals($rightRightSide->text, 'Charlotte');
+		
 
 		} catch (ParserException $e) {
 			echo 'Parse Error: ' . $e->getMessage();
