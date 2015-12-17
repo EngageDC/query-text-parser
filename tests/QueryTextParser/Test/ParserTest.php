@@ -19,7 +19,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 			$result = $this->parser->parse('Chicago');
 
 			$this->assertInstanceOf('Engage\QueryTextParser\Data\Group', $result);
-			
+
 			$this->assertEquals($result->type, GroupComparison::OPERATOR_AND);
 			$this->assertCount(1, $result->children);
 
@@ -133,7 +133,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 				Charlotte
 			)
 			*/
-		
+
 			// Verify consistency of outer group
 			$this->assertInstanceOf('Engage\QueryTextParser\Data\Group', $result);
 			$this->assertEquals($result->type, GroupComparison::OPERATOR_OR);
@@ -175,7 +175,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 			$rightRightSide = $rightSide->children[1];
 			$this->assertInstanceOf('Engage\QueryTextParser\Data\Partial', $rightRightSide);
 			$this->assertEquals($rightRightSide->text, 'Charlotte');
-		
+
 
 		} catch (ParserException $e) {
 			echo 'Parse Error: ' . $e->getMessage();
@@ -201,6 +201,34 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
 			$this->assertEquals($result->children[1]->text, 'San Francisco');
 			$this->assertEquals($result->children[1]->negate, false);
+		} catch (ParserException $e) {
+			echo 'Parse Error: ' . $e->getMessage();
+		}
+    }
+
+    public function testNegate() {
+		try {
+			$result = $this->parser->parse('-"New York" AND Home AND -Cleveland');
+
+			// Verify consistency of group
+			$this->assertInstanceOf('Engage\QueryTextParser\Data\Group', $result);
+			$this->assertEquals($result->type, GroupComparison::OPERATOR_AND);
+
+			$this->assertCount(3, $result->children);
+
+			// Verify consistency of children
+			$this->assertInstanceOf('Engage\QueryTextParser\Data\Partial', $result->children[0]);
+			$this->assertInstanceOf('Engage\QueryTextParser\Data\Partial', $result->children[1]);
+			$this->assertInstanceOf('Engage\QueryTextParser\Data\Partial', $result->children[2]);
+
+			$this->assertEquals($result->children[0]->text, 'New York');
+			$this->assertEquals($result->children[0]->negate, true);
+
+			$this->assertEquals($result->children[1]->text, 'Home');
+			$this->assertEquals($result->children[1]->negate, false);
+
+            $this->assertEquals($result->children[2]->text, 'Cleveland');
+			$this->assertEquals($result->children[2]->negate, true);
 		} catch (ParserException $e) {
 			echo 'Parse Error: ' . $e->getMessage();
 		}

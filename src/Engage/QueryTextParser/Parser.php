@@ -76,15 +76,14 @@ class Parser
     private function parsePartials($query, $group) {
         $query = $this->trim($query);
 
-        // We use str_getcsv to support quoted strings (i.e. "San Francisco")
-        $parts = str_getcsv($query, ' ');
+        $parts = Tokenizer::tokenize($query);
 
         $alreadyDetectedGroupType = null;
         $children = array();
 
         foreach ($parts as $part) {
-            if ($part == 'AND' || $part == 'OR') {
-                $operator = ($part == 'AND' ? GroupComparison::OPERATOR_AND : GroupComparison::OPERATOR_OR);
+            if ($part['token'] == 'AND' || $part['token'] == 'OR') {
+                $operator = ($part['token'] == 'AND' ? GroupComparison::OPERATOR_AND : GroupComparison::OPERATOR_OR);
 
                 // If we already detected a group type, we'll have to
                 // create a sub group for these partials
@@ -99,7 +98,8 @@ class Parser
                 $alreadyDetectedGroupType = $operator;
             } else {
                 $partial = new Partial;
-                $partial->text = $part;
+                $partial->text = $part['token'];
+                $partial->negate = $part['negated'];
                 $children[] = $partial;
             }
         }
@@ -108,6 +108,6 @@ class Parser
     }
 
     private function trim($str) {
-        return trim($str, " \t\n\r\0\x0B()"); 
+        return trim($str, " \t\n\r\0\x0B()");
     }
 }
