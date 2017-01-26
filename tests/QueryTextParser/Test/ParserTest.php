@@ -206,31 +206,30 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 		}
     }
 
-    public function testNegate() {
+	public function testSimpleNear() {
 		try {
-			$result = $this->parser->parse('-"New York" AND Home AND -Cleveland');
+			$result = $this->parser->parse('Chicago NEAR Houston');
 
 			// Verify consistency of group
 			$this->assertInstanceOf('Engage\QueryTextParser\Data\Group', $result);
-			$this->assertEquals($result->type, GroupComparison::OPERATOR_AND);
+			$this->assertEquals($result->type, GroupComparison::OPERATOR_NEAR);
 
-			$this->assertCount(3, $result->children);
+			$this->assertCount(2, $result->children);
 
 			// Verify consistency of children
 			$this->assertInstanceOf('Engage\QueryTextParser\Data\Partial', $result->children[0]);
 			$this->assertInstanceOf('Engage\QueryTextParser\Data\Partial', $result->children[1]);
-			$this->assertInstanceOf('Engage\QueryTextParser\Data\Partial', $result->children[2]);
 
-			$this->assertEquals($result->children[0]->text, 'New York');
-			$this->assertEquals($result->children[0]->negate, true);
+			$this->assertEquals($result->children[0]->text, 'Chicago');
+			$this->assertEquals($result->children[0]->negate, false);
 
-			$this->assertEquals($result->children[1]->text, 'Home');
+			$this->assertEquals($result->children[1]->text, 'Houston');
 			$this->assertEquals($result->children[1]->negate, false);
-
-            $this->assertEquals($result->children[2]->text, 'Cleveland');
-			$this->assertEquals($result->children[2]->negate, true);
 		} catch (ParserException $e) {
 			echo 'Parse Error: ' . $e->getMessage();
 		}
     }
+
+
+
 }

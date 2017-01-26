@@ -82,8 +82,8 @@ class Parser
         $children = array();
 
         foreach ($parts as $part) {
-            if ($part['token'] == 'AND' || $part['token'] == 'OR') {
-                $operator = ($part['token'] == 'AND' ? GroupComparison::OPERATOR_AND : GroupComparison::OPERATOR_OR);
+            if (GroupComparison::isValidOperator($part['token'])) {
+                $operator = $part['token'];
 
                 // If we already detected a group type, we'll have to
                 // create a sub group for these partials
@@ -105,6 +105,11 @@ class Parser
         }
 
         $group->children = array_merge($group->children, $children);
+    }
+
+    private function getPartOperator($part)
+    {
+
     }
 
     private function trim($str) {
