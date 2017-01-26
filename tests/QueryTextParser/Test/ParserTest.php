@@ -231,5 +231,28 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     }
 
 
+	public function testSimpleAdj() {
+		try {
+			$result = $this->parser->parse('Chicago ADJ Houston');
+
+			// Verify consistency of group
+			$this->assertInstanceOf('Engage\QueryTextParser\Data\Group', $result);
+			$this->assertEquals($result->type, GroupComparison::OPERATOR_ADJ);
+
+			$this->assertCount(2, $result->children);
+
+			// Verify consistency of children
+			$this->assertInstanceOf('Engage\QueryTextParser\Data\Partial', $result->children[0]);
+			$this->assertInstanceOf('Engage\QueryTextParser\Data\Partial', $result->children[1]);
+
+			$this->assertEquals($result->children[0]->text, 'Chicago');
+			$this->assertEquals($result->children[0]->negate, false);
+
+			$this->assertEquals($result->children[1]->text, 'Houston');
+			$this->assertEquals($result->children[1]->negate, false);
+		} catch (ParserException $e) {
+			echo 'Parse Error: ' . $e->getMessage();
+		}
+    }
 
 }
