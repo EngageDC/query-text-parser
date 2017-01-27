@@ -55,7 +55,6 @@ class Parser
                         if ($start < 0) {
                             $start = 0;
                         }
-
                         $this->parseGroup(substr($query, $start, $length), $group);
                         $depthEndIndex = $i;
                     }
@@ -93,7 +92,6 @@ class Parser
                     $subGroup->children = $children;
                     $children = array($subGroup); // Reset children
                 }
-
                 $group->type = $operator;
                 $alreadyDetectedGroupType = $operator;
             } else {
