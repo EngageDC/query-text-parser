@@ -13,12 +13,13 @@ The library is fully unit-tested.
 * AND/OR operators
 * Grouped queries using paranthesis -- i.e. `(Denver AND Boston) OR Miami`
 * Multi-word search queries using quotes -- i.e. `"San Francisco" AND Chicago`
+* Negated matches -- i.e. 'Denver AND -Boston AND -"San Francisco"'
 
 ## Example usage
 
 ```php
 $parser = new Engage\QueryTextParser\Parser;
-$result = $parser->parse('(Chicago AND Houston) OR Phoenix');
+$result = $parser->parse('(Chicago AND -Houston) OR Phoenix');
 print_r($result);
 ```
 
@@ -37,13 +38,13 @@ Engage\QueryTextParser\Data\Group Object
                             [0] => Engage\QueryTextParser\Data\Partial Object
                                 (
                                     [text] => Chicago
-                                    [negate] =>
+                                    [negate] => false
                                 )
 
                             [1] => Engage\QueryTextParser\Data\Partial Object
                                 (
                                     [text] => Houston
-                                    [negate] =>
+                                    [negate] => true
                                 )
 
                         )
@@ -53,7 +54,7 @@ Engage\QueryTextParser\Data\Group Object
             [1] => Engage\QueryTextParser\Data\Partial Object
                 (
                     [text] => Phoenix
-                    [negate] =>
+                    [negate] => false
                 )
 
         )
